@@ -1,0 +1,59 @@
+plugins {
+	id 'java'
+	id 'war'
+	id 'org.springframework.boot' version '3.5.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.green.star'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+configurations.all {
+	// Logback(기본 로거) 전역 제외 → Log4j2만 사용
+	exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+}
+
+dependencies {
+	// Spring
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2' // ✅ Log4j2
+	implementation 'org.modelmapper:modelmapper:3.1.1'
+
+	// DB
+	runtimeOnly 'com.mysql:mysql-connector-j'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// Dev / Test
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// 외부 톰캣에 배포할 WAR일 때
+	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
