@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @Getter
 @SuperBuilder
+@ToString
 public class PageRequestDTO {
 
     @Builder.Default

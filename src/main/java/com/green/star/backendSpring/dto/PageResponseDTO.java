@@ -20,17 +20,27 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
 
     @Builder(builderMethodName = "withAll")
     public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long totalCnt) {
+        // 데이터가 들어있는 dtoList
         this.dtoList = dtoList;
+        // pageRequestDTO 에는 page 와 size 정보가 들어있음
         this.pageRequestDTO=pageRequestDTO;
+        // DB 에서 꺼내온 데이터의 갯수
         this.totalCount=(int)totalCnt;
 
+        // 현재 누를 수 있는 마지막 페이지 1~10이 있다면 10 (현재 블록의 끝 페이지 번호)
         // 현재 page=7 이라면 end=10, 현재 page=11 -> end=20, 현재 page=23 -> end=30 이렇게 하기 위한 수식
         int end = (int)(Math.ceil(pageRequestDTO.getPage()/10.0))*10;
+        // 시작 페이지 1~10 까지 있다면 1
         int start = end-9;
+        // 전체 데이터 기준으로 계산한 실제 마지막 페이지 번호
+        // ex) 전체 데이터 105개, 페이지당 개수(size)= 10일 때, last = Math.ceil(10.5)=11 , 즉 11페이지까지 있다
         int last = (int)(Math.ceil((totalCnt/(double)pageRequestDTO.getSize())));
+        // end 가 last 보다 크면 end 를 last 로 맞춰 페이지 번호가 실제 범위를 벗어나지 않도록 조정함
         end = end > last ? last: end;
+        // start 가 1보다 크다면 true
         this.prev = start>1;
-        this.next = totalCnt > end*pageRequestDTO.getPage();
+        // getPate() 를 getSize() 로 수정함
+        this.next = totalCnt > end*pageRequestDTO.getSize();
         this.pageNumList = IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
         if(prev) this.prevPage = start-1;
         if(next) this.nextPage = end+1;

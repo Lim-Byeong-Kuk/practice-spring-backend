@@ -32,22 +32,30 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public Long register(TodoDTO dto) {
-        log.info("==================");
+        log.info("2)서비스 데이터 등록 dto ={}",dto);
         Todo todo = modelMapper.map(dto, Todo.class); //dto => entity 변환
+        log.info("3)서비스 데이터 등록 dto 를 entity 로 변환 ={}",todo);
         Todo savedTodo = repository.save(todo);
+        log.info("4)서비스 데이터 등록 DB에 반영 후 entity ={}",savedTodo);
         return savedTodo.getTno();
     }
 
     @Override
     public TodoDTO get(Long tno) {
+        log.info("1)서비스 데이터 하나 조회 get tno={}",tno);
         Optional<Todo> result = repository.findById(tno);
+        log.info("2)서비스 tno={} 데이터 하나 조회 entity={}",tno,result);
         Todo todo = result.orElseThrow();
-        return modelMapper.map(todo, TodoDTO.class);
+        TodoDTO dto = modelMapper.map(todo, TodoDTO.class);
+        log.info("3)서비스 데이터 하나 조회하여 dto={}",dto);
+        return dto;
     }
 
     @Override
     public void modify(TodoDTO dto) {
+        log.info("2) service 수정 dto ={}",dto);
         Optional<Todo> result = repository.findById(dto.getTno());
+        log.info("3) service 수정을 하기 위한 데이터 조회 result ={}",result);
         Todo todo = result.orElseThrow();
         todo.changeTitle(dto.getTitle());
         todo.changeDueDate(dto.getDueDate());
@@ -58,12 +66,13 @@ public class TodoServiceImpl implements TodoService{
 
     @Override
     public void remove(Long tno) {
-
+        log.info("service remove tno ={}",tno);
+        repository.deleteById(tno);
     }
 
     @Override
     public PageResponseDTO<TodoDTO> list(PageRequestDTO pageRequestDTO) {
-
+        log.info("전체 조회 service: pageRequestDTO = {}", pageRequestDTO);
         Pageable pageable =
                 PageRequest.of(
                         pageRequestDTO.getPage()-1,
