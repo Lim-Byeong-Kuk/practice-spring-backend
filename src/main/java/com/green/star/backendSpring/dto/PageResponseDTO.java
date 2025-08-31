@@ -24,10 +24,10 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
         this.dtoList = dtoList;
         // pageRequestDTO 에는 page 와 size 정보가 들어있음
         this.pageRequestDTO=pageRequestDTO;
-        // DB 에서 꺼내온 데이터의 갯수
+        // DB 테이블에 저장되어있는 전체 데이터의 갯수
         this.totalDataCnt=(int)totalDataCount;
 
-        // getPage()가 최소 페이지 값을 강제로 1로 처리하는 방법
+        // getPage()가 최소 페이지 값을 강제로 1로 처리하는 방법, page=0 은 존재하지 않는다.
         this.currentPage = Math.max(1, pageRequestDTO.getPage());
         // 현재 누를 수 있는 마지막 페이지 1~10이 있다면 10 (현재 블록의 끝 페이지 번호)
         // 현재 page=7 이라면 end=10, 현재 page=11 -> end=20, 현재 page=23 -> end=30 이렇게 하기 위한 수식
@@ -37,7 +37,7 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
         // 전체 데이터 기준으로 계산한 실제 마지막 페이지 번호
         // ex) 전체 데이터 105개, 페이지당 개수(size)= 10일 때, last = Math.ceil(10.5)=11 , 즉 11페이지까지 있다
         int totalPagesCnt = (int)(Math.ceil((totalDataCount/(double)pageRequestDTO.getSize())));
-        // end 가 last 보다 크면 end 를 last 로 맞춰 페이지 번호가 실제 범위를 벗어나지 않도록 조정함
+        // endOfPageBlock 가 totalPagesCnt 보다 크면 endOfPageBlock 를 totalPagesCnt 로 맞춰 페이지 번호가 실제 범위를 벗어나지 않도록 조정함
         endOfPageBlock = Math.min(endOfPageBlock, totalPagesCnt);
         // 이전 페이지가 존재하면 hasPrevPageGroup = true
         this.hasPrevPageGroup = startOfPageBlock > 1;
@@ -45,10 +45,12 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
         this.hasNextPageGroup = endOfPageBlock < totalPagesCnt;
         // startOfPageBlock ~ endOfPageBlock 까지의 페이지 번호 목록 생성
         this.pageNumList = IntStream.rangeClosed(startOfPageBlock, endOfPageBlock).boxed().collect(Collectors.toList());
-        // 프론트에서 < 이전, 다음 > 버튼 클릭 시 이동할 페이지 지정
+        // 프론트에서 < 이전, 다음 > 버튼 클릭 시 이동할 페이지 지정,
+        // < 버튼 누르면 startOfPageBlock - 1 페이지로 이동
+        // > 버튼 누르면 endOfPageBlock + 1 로 이동
         if(hasPrevPageGroup) this.prevGroupLastPage = startOfPageBlock - 1;
         if(hasNextPageGroup) this.nextGroupFirstPage = endOfPageBlock + 1;
-
+        // 현재 페이지블록의 페이지 갯수 ( 페이지네이션 바에서 1,2,3,4,5 <- 이렇게 보이는 버튼의 갯수를 의미 )
         this.currentPageBlockCnt = this.pageNumList.size();
 
     }
