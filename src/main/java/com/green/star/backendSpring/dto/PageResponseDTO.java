@@ -15,9 +15,9 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
     //멤버변수로 처리함, 페이지 이동 및 검색후 이동시 항상 현재 페이지와 페이지당 갯수가 get 방식으로 따라다녀야
     //초기화 되지 않는다.
     private boolean hasPrevPageGroup, hasNextPageGroup; // 이전 페이지 블록이 있는지, 다음 페이지 블록이 있는지
-    private int totalDataCnt, prevGroupLastPage, nextGroupFirstPage, totalPageCnt, currentPage;
+    private int totalDataCnt, prevGroupLastPage, nextGroupFirstPage, currentPageBlockCnt, currentPage;
     //totalDataCnt: 전체 데이터 갯수, prevGroupLastPage: 이전 블록의 마지막 페이지, nextGroupFirstPage : 다음 블록의 첫 페이지
-    //totalPageCnt: 페이지 수 총 합
+    //currentPageBlockCnt: 현재 페이지네이션 바의 표현되고 있는 페이지 버튼의 갯수 ( 페이지블록의 갯수)
     @Builder(builderMethodName = "withAll")
     public PageResponseDTO(List<E> dtoList, PageRequestDTO pageRequestDTO, long totalDataCount) {
         // 데이터가 들어있는 dtoList
@@ -49,7 +49,7 @@ public class PageResponseDTO<E> { // 브라우저에게 dtoList 를 요청한 �
         if(hasPrevPageGroup) this.prevGroupLastPage = startOfPageBlock - 1;
         if(hasNextPageGroup) this.nextGroupFirstPage = endOfPageBlock + 1;
 
-        this.totalPageCnt = this.pageNumList.size();
+        this.currentPageBlockCnt = this.pageNumList.size();
 
     }
 }
